@@ -1,0 +1,11 @@
+@import url("~/assets/css/variables/color.css");
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  appearance: none;
+  color-scheme: light;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
