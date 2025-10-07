@@ -44,8 +44,8 @@ export class LiquidSortSolver {
       ]
     }
 
-    const tubes: Tube[] = Array.from({ length: this._tubeCount }, () =>
-      Array(this._tubeVolume).fill(null),
+    const tubes: Tube[] = Array.from({ length: this.tubeCount }, () =>
+      Array(this.tubeVolume).fill(null),
     )
     for (let colorIndex = 0; colorIndex < this.colorCount; colorIndex++) {
       const start = colorIndex * this.tubeVolume
@@ -66,7 +66,7 @@ export class LiquidSortSolver {
     return { color: null, index: -1 }
   }
 
-  public pourColor(tubes: Tube[] = this._tubes, source: number, target: number): boolean {
+  public pourColor(tubes: Tube[] = this.tubes, source: number, target: number): boolean {
     const sourceTube = tubes[source]
     const targetTube = tubes[target]
 
@@ -110,7 +110,7 @@ export class LiquidSortSolver {
     )
   }
 
-  public checkTubesSolved(tubes: Tube[] = this._tubes): boolean {
+  public checkTubesSolved(tubes: Tube[] = this.tubes): boolean {
     return tubes.every(this.checkTubeSolved.bind(this))
   }
 
@@ -118,7 +118,7 @@ export class LiquidSortSolver {
     const checkedStates = new Set<string>()
 
     const queue: { tubes: Tube[]; moves: Move[] }[] = [
-      { tubes: this._tubes.map((tube) => [...tube]), moves: [] },
+      { tubes: this.tubes.map((tube) => [...tube]), moves: [] },
     ]
 
     while (queue.length > 0) {

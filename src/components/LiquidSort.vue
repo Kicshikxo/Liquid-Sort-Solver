@@ -1,61 +1,79 @@
 <template>
-  <div class="puzzle">
-    <div class="tubes">
-      <div
-        v-for="(tube, tubeIndex) in currentHistoryState"
-        :key="tubeIndex"
-        :class="['tube', { 'tube--solved': liquidSortSolver.checkTubeSolved(tube) }]"
-      >
-        <div
-          v-for="(color, colorIndex) in [...tube].reverse()"
-          :key="colorIndex"
-          class="tube-color"
-          :style="{
-            backgroundColor:
-              colorMap[color ?? Math.floor(Math.random() * Object.keys(colorMap).length)] || '#ccc',
+  <div v-if="tubesHistory.length" class="liquid-sort">
+    <div class="container">
+      <div class="tubes">
+        <div class="tube-wrapper" v-for="(tube, tubeIndex) in currentHistoryState" :key="tubeIndex">
+          <div
+            :class="['tube-cap',{'tube-cap--visible':!tube.some((color: number | null) => color === null) && liquidSortSolver.checkTubeSolved(tube),}]"
+          ></div>
+          <div class="tube">
+            <div
+              v-for="(color, colorIndex) in [...tube].reverse()"
+              :key="colorIndex"
+              class="tube-color"
+              :style="{
+            backgroundColor: colorMap[color!] || 'var(--color-gray-200)',
           }"
-        />
+            />
+          </div>
+        </div>
       </div>
     </div>
 
-    {{ currentHistoryIndex }}
-    <button @click="previousHistoryState" :disabled="currentHistoryIndex === 0">
-      Предыдущий ход
-    </button>
-    <button @click="nextHistoryState" :disabled="solutionShown">Следующий ход</button>
-    <p v-if="solutionShown">Решено за {{ liquidSortSolver.moves.length }} ходов</p>
+    <div class="container">
+      <div>
+        Текущий шаг:
+        <input
+          v-model="currentHistoryIndex"
+          :max="tubesHistory.length - 1"
+          class="input"
+          type="number"
+        />
+      </div>
+      <div style="display: flex; gap: 16px">
+        <button class="button" @click="previousHistoryState" :disabled="currentHistoryIndex === 0">
+          Предыдущий шаг
+        </button>
+        <button
+          class="button"
+          @click="nextHistoryState"
+          :disabled="currentHistoryIndex >= tubesHistory.length || tubesHistory.length <= 1"
+        >
+          Следующий шаг
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { LiquidSortSolver } from '../assets/ts/liquid-sort-solver'
+
 const props = withDefaults(
   defineProps<{
     tubesCount?: number
     tubeVolume?: number
-    colorsCount?: number
+    colorCount?: number
   }>(),
   {
-    tubesCount: 7,
+    tubesCount: 14,
     tubeVolume: 4,
-    colorsCount: 5,
-    // tubesCount: 14,
-    // tubeVolume: 4,
-    // colorsCount: 12,
+    colorCount: 12,
   },
 )
 
-const liquidSortSolver = ref(
-  new LiquidSortSolver(props.tubesCount, props.tubeVolume, props.colorsCount),
+const liquidSortSolver = computed(
+  () => new LiquidSortSolver(props.tubesCount, props.tubeVolume, props.colorCount),
 )
 
 const tubesHistory = computed(() => liquidSortSolver.value.getTubesHistory())
 const currentHistoryIndex = ref(0)
-const currentHistoryState = computed(() => tubesHistory.value[currentHistoryIndex.value])
-
-const solutionShown = computed(
-  () => currentHistoryIndex.value === liquidSortSolver.value.moves.length,
+const currentHistoryState = computed(
+  () =>
+    tubesHistory.value[
+      Math.max(0, Math.min(currentHistoryIndex.value, tubesHistory.value.length - 1))
+    ],
 )
 
 const colorMap: Record<string, string> = {
@@ -86,7 +104,9 @@ const colorMap: Record<string, string> = {
   24: 'var(--color-stone-400)',
 }
 
-onMounted(() => {
+watch(props, () => {
+  currentHistoryIndex.value = 0
+
   console.time('generateRandomTubes')
   liquidSortSolver.value.generateRandomTubes()
   console.timeEnd('generateRandomTubes')
@@ -111,41 +131,58 @@ function nextHistoryState() {
 </script>
 
 <style scoped>
-.puzzle {
+.liquid-sort {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  margin-top: 2rem;
+  padding: 16px;
+  gap: 16px;
 }
 
 .tubes {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
-  justify-content: center;
-  margin-bottom: 1.5rem;
 }
 
+.tube-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.tube-cap {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background-color: var(--color-amber-600);
+  transform: translateY(-5px);
+  clip-path: polygon(10% 0%, 90% 0%, 80% 100%, 20% 100%);
+  border-radius: 10px 10px 0 0;
+  z-index: 1;
+}
+.tube-cap--visible {
+  display: block;
+}
 .tube {
   width: 40px;
-  height: 160px;
-  border: 2px solid #333;
-  border-radius: 10px;
+  height: 180px;
+  padding-top: 20px;
+  border-radius: 0 0 10px 10px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: #eee;
+  background: var(--color-gray-200);
   overflow: hidden;
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-}
-.tube--solver {
-  background: red;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
 }
 
 .tube-color {
-  width: 100%;
-  height: 25%;
+  flex: 1;
   border-top: 1px solid rgba(0, 0, 0, 0.25);
-  transition: background 0.3s;
+  transition: background-color 0.3s;
 }
 </style>
