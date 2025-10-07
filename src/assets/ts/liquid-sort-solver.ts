@@ -122,7 +122,7 @@ export class LiquidSortSolver {
     ]
 
     while (queue.length > 0) {
-      const state = queue.pop()!
+      const state = queue.shift()!
       const stateKey = JSON.stringify(state.tubes)
 
       if (checkedStates.has(stateKey)) continue
@@ -149,9 +149,12 @@ export class LiquidSortSolver {
           if (lastMove && lastMove[0] === target && lastMove[1] === source) continue
 
           const tubesCopy = state.tubes.map((tube) => [...tube])
-          if (this.pourColor(tubesCopy, source, target)) {
-            queue.push({ tubes: tubesCopy, moves: [...state.moves, [source, target]] })
-          }
+          if (!this.pourColor(tubesCopy, source, target)) continue
+
+          const copyStateKey = JSON.stringify(tubesCopy)
+          if (checkedStates.has(copyStateKey)) continue
+
+          queue.push({ tubes: tubesCopy, moves: [...state.moves, [source, target]] })
         }
       }
     }
