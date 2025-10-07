@@ -1,14 +1,8 @@
-import { resolve } from "path";
+import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: "src",
-
-  resolve: {
-    alias: {
-      "~": resolve(__dirname, "src"),
-    },
-  },
+  plugins: [vue()],
 
   server: {
     port: Number(process.env.PORT) || 3000,
@@ -16,10 +10,5 @@ export default defineConfig({
 
   preview: {
     port: Number(process.env.PORT) || 3000,
-  },
-
-  build: {
-    outDir: "../dist",
-    emptyOutDir: true,
   },
 });
