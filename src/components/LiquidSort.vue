@@ -47,24 +47,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { LiquidSortSolver } from '../assets/ts/liquid-sort-solver'
 
-const props = withDefaults(
-  defineProps<{
-    tubesCount?: number
-    tubeVolume?: number
-    colorCount?: number
-  }>(),
-  {
-    tubesCount: 14,
-    tubeVolume: 4,
-    colorCount: 12,
-  },
-)
+const props = defineProps<{
+  tubesCount: number
+  tubeVolume: number
+  colorCount: number
+}>()
 
-const liquidSortSolver = computed(
-  () => new LiquidSortSolver(props.tubesCount, props.tubeVolume, props.colorCount),
+const liquidSortSolver = ref(
+  new LiquidSortSolver(props.tubesCount, props.tubeVolume, props.colorCount),
 )
 
 const tubesHistory = computed(() => liquidSortSolver.value.getTubesHistory())
@@ -104,8 +97,14 @@ const colorMap: Record<string, string> = {
   24: 'var(--color-stone-400)',
 }
 
-watch(props, () => {
+function generateRandomTubes() {
   currentHistoryIndex.value = 0
+
+  liquidSortSolver.value = new LiquidSortSolver(
+    props.tubesCount,
+    props.tubeVolume,
+    props.colorCount,
+  )
 
   console.time('generateRandomTubes')
   liquidSortSolver.value.generateRandomTubes()
@@ -116,6 +115,10 @@ watch(props, () => {
   liquidSortSolver.value.generateSolvedMoves()
   console.timeEnd('generateSolvedMoves')
   console.log(liquidSortSolver.value.moves)
+}
+
+defineExpose({
+  generateRandomTubes,
 })
 
 function previousHistoryState() {

@@ -9,7 +9,6 @@
             type="number"
             name="tubes-count"
             placeholder="Введите количество пробирок"
-            required
           />
         </div>
         <div class="input__field">
@@ -19,7 +18,6 @@
             type="number"
             name="tube-volume"
             placeholder="Введите объём пробирки"
-            required
           />
         </div>
         <div class="input__field">
@@ -29,22 +27,27 @@
             type="number"
             name="color-count"
             placeholder="Введите количество цветов"
-            required
           />
         </div>
         <button class="button" type="submit">Сгенерировать</button>
       </form>
 
-      <LiquidSort :tubes-count="tubesCount" :tube-volume="tubeVolume" :color-count="colorCount" />
+      <LiquidSort
+        ref="liquidSort"
+        :tubes-count="tubesCount"
+        :tube-volume="tubeVolume"
+        :color-count="colorCount"
+      />
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import LiquidSort from './components/LiquidSort.vue'
 
 const form = ref<HTMLFormElement | undefined>()
+const liquidSort = ref<typeof LiquidSort | undefined>()
 
 const tubesCount = ref(0)
 const tubeVolume = ref(0)
@@ -56,6 +59,8 @@ function onSubmit() {
   tubesCount.value = Number(formData.get('tubes-count'))
   tubeVolume.value = Number(formData.get('tube-volume'))
   colorCount.value = Number(formData.get('color-count'))
+
+  nextTick(liquidSort.value?.generateRandomTubes)
 }
 </script>
 
@@ -75,6 +80,11 @@ function onSubmit() {
   width: 100%;
   min-height: 100%;
   position: absolute;
-  padding: 16px;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .page {
+    padding: 16px;
+  }
 }
 </style>
