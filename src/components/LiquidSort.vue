@@ -2,27 +2,34 @@
   <div class="puzzle">
     <div class="tubes">
       <div
-        v-for="(tube, tubeIndex) in liquidSort.tubes"
+        v-for="(tube, tubeIndex) in currentHistoryState"
         :key="tubeIndex"
-        :class="['tube', { 'tube--solved': liquidSort.checkTubeSolved(tube) }]"
+        :class="['tube', { 'tube--solved': liquidSortSolver.checkTubeSolved(tube) }]"
       >
         <div
-          v-for="(drop, dropIndex) in [...tube].reverse()"
-          :key="dropIndex"
-          class="drop"
-          :style="{ backgroundColor: colorMap[drop] || '#ccc' }"
+          v-for="(color, colorIndex) in [...tube].reverse()"
+          :key="colorIndex"
+          class="tube-color"
+          :style="{
+            backgroundColor:
+              colorMap[color ?? Math.floor(Math.random() * Object.keys(colorMap).length)] || '#ccc',
+          }"
         />
       </div>
     </div>
 
-    <button @click="step" :disabled="solutionShown">Следующий ход</button>
-    <p v-if="solutionShown">Решено за {{ liquidSort.moves.length }} ходов</p>
+    {{ currentHistoryIndex }}
+    <button @click="previousHistoryState" :disabled="currentHistoryIndex === 0">
+      Предыдущий ход
+    </button>
+    <button @click="nextHistoryState" :disabled="solutionShown">Следующий ход</button>
+    <p v-if="solutionShown">Решено за {{ liquidSortSolver.moves.length }} ходов</p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { LiquidSort } from '../assets/ts/liquid-sort'
+import { LiquidSortSolver } from '../assets/ts/liquid-sort-solver'
 const props = withDefaults(
   defineProps<{
     tubesCount?: number
@@ -30,75 +37,76 @@ const props = withDefaults(
     colorsCount?: number
   }>(),
   {
-    tubesCount: 8,
+    tubesCount: 7,
     tubeVolume: 4,
-    colorsCount: 6,
+    colorsCount: 5,
+    // tubesCount: 14,
+    // tubeVolume: 4,
+    // colorsCount: 12,
   },
 )
 
-const liquidSort = new LiquidSort(props.tubesCount, props.tubeVolume, props.colorsCount)
+const liquidSortSolver = ref(
+  new LiquidSortSolver(props.tubesCount, props.tubeVolume, props.colorsCount),
+)
 
-// const N = 8
-// const V = 4
-// const M = 6
+const tubesHistory = computed(() => liquidSortSolver.value.getTubesHistory())
+const currentHistoryIndex = ref(0)
+const currentHistoryState = computed(() => tubesHistory.value[currentHistoryIndex.value])
 
-// const tubes = ref<Tube[]>([])
-// const moves = ref<Move[]>([])
-const currentMove = ref(0)
-// const solved = ref(false)
-
-const solutionShown = computed(() => currentMove.value === liquidSort.moves.length)
+const solutionShown = computed(
+  () => currentHistoryIndex.value === liquidSortSolver.value.moves.length,
+)
 
 const colorMap: Record<string, string> = {
-  0: 'var(--color-red-300)',
-  1: 'var(--color-blue-300)',
-  2: 'var(--color-green-300)',
-  3: 'var(--color-orange-300)',
-  4: 'var(--color-purple-300)',
-  5: 'var(--color-cyan-300)',
-  6: 'var(--color-pink-300)',
-  7: 'var(--color-lime-300)',
+  0: 'var(--color-red-400)',
+  1: 'var(--color-green-400)',
+  2: 'var(--color-blue-400)',
+  3: 'var(--color-orange-400)',
+  4: 'var(--color-purple-400)',
+  5: 'var(--color-cyan-400)',
+  6: 'var(--color-pink-400)',
+  7: 'var(--color-lime-400)',
+  8: 'var(--color-amber-400)',
+  9: 'var(--color-yellow-400)',
+  10: 'var(--color-emerald-400)',
+  11: 'var(--color-teal-400)',
+  12: 'var(--color-cyan-400)',
+  13: 'var(--color-sky-400)',
+  14: 'var(--color-indigo-400)',
+  15: 'var(--color-violet-400)',
+  16: 'var(--color-violet-400)',
+  17: 'var(--color-fuchsia-400)',
+  18: 'var(--color-pink-400)',
+  19: 'var(--color-rose-400)',
+  20: 'var(--color-slate-400)',
+  21: 'var(--color-gray-400)',
+  22: 'var(--color-zinc-400)',
+  23: 'var(--color-neutral-400)',
+  24: 'var(--color-stone-400)',
 }
 
 onMounted(() => {
-  console.time('generatePuzzle')
-  liquidSort.generateTubes()
-  // tubes.value = generatePuzzle(props.tubesCount, props.tubeVolume, props.colorsCount)
-  console.timeEnd('generatePuzzle')
-  console.log(liquidSort.tubes)
-  console.time('solve')
-  // liquidSort.generateSolvedMoves()
-  // const result = solve(tubes.value, V, 150)
-  console.timeEnd('solve')
-  console.log(liquidSort.moves)
-  // moves.value = result ?? []
+  console.time('generateRandomTubes')
+  liquidSortSolver.value.generateRandomTubes()
+  console.timeEnd('generateRandomTubes')
+  console.log(liquidSortSolver.value.tubes)
+
+  console.time('generateSolvedMoves')
+  liquidSortSolver.value.generateSolvedMoves()
+  console.timeEnd('generateSolvedMoves')
+  console.log(liquidSortSolver.value.moves)
 })
 
-function step(): void {
-  const move = liquidSort.moves[currentMove.value]
-  if (!move) {
-    return
+function previousHistoryState() {
+  if (currentHistoryIndex.value > 0) {
+    currentHistoryIndex.value--
   }
-
-  const [source, target] = move
-  const sourceTube = liquidSort.tubes[source]
-  const targetTube = liquidSort.tubes[target]
-
-  if (!sourceTube?.length || !targetTube) return
-
-  const targetColor = sourceTube.at(-1)
-  if (!targetColor) return
-
-  while (
-    sourceTube.length &&
-    sourceTube.at(-1) === targetColor &&
-    targetTube.length < liquidSort.tubeVolume
-  ) {
-    const color = sourceTube.pop()
-    if (color) targetTube.push(color)
+}
+function nextHistoryState() {
+  if (currentHistoryIndex.value < tubesHistory.value.length - 1) {
+    currentHistoryIndex.value++
   }
-
-  currentMove.value++
 }
 </script>
 
@@ -134,7 +142,7 @@ function step(): void {
   background: red;
 }
 
-.drop {
+.tube-color {
   width: 100%;
   height: 25%;
   border-top: 1px solid rgba(0, 0, 0, 0.25);
