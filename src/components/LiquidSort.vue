@@ -37,7 +37,7 @@
         <button
           class="button"
           @click="nextHistoryState"
-          :disabled="currentHistoryIndex >= tubesHistory.length || tubesHistory.length <= 1"
+          :disabled="currentHistoryIndex >= tubesHistory.length - 1 || tubesHistory.length <= 1"
         >
           Следующий шаг
         </button>

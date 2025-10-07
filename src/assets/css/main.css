@@ -87,6 +87,5 @@
   background-color: #d1d5db;
 }
 .button:disabled {
-  cursor: progress;
   opacity: 0.75;
 }
