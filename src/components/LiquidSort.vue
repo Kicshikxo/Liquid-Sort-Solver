@@ -31,7 +31,7 @@
         />
       </div>
       <div style="display: flex; gap: 16px">
-        <button class="button" @click="previousHistoryState" :disabled="currentHistoryIndex === 0">
+        <button class="button" @click="previousHistoryState" :disabled="currentHistoryIndex <= 0">
           Предыдущий шаг
         </button>
         <button
@@ -115,6 +115,10 @@ function generateRandomTubes() {
   liquidSortSolver.value.generateSolvedMoves()
   console.timeEnd('generateSolvedMoves')
   console.log(liquidSortSolver.value.moves)
+
+  if (!liquidSortSolver.value.moves.length) {
+    alert('Решение не найдено. Попробуйте изменить исходные данные.')
+  }
 }
 
 defineExpose({
