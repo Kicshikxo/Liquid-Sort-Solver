@@ -66,6 +66,13 @@
 .input__field label {
   color: #6a7282;
 }
+.input__field--checkbox {
+  flex-direction: row;
+  gap: 8px;
+}
+.input__field--checkbox input {
+  appearance: auto;
+}
 
 .button {
   cursor: pointer;

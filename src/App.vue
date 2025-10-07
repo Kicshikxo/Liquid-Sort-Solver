@@ -3,31 +3,41 @@
     <section class="page">
       <form ref="form" class="form" @submit.prevent="onSubmit">
         <div class="input__field">
-          <label for="city">Количество пробирок (N)</label>
+          <label for="tubes-count">Количество пробирок (N)</label>
           <input
             class="input"
             type="number"
+            id="tubes-count"
             name="tubes-count"
             placeholder="Введите количество пробирок"
           />
         </div>
         <div class="input__field">
-          <label for="city">Объём пробирки (V)</label>
+          <label for="tube-volume">Объём пробирки (V)</label>
           <input
             class="input"
             type="number"
+            id="tube-volume"
             name="tube-volume"
             placeholder="Введите объём пробирки"
           />
         </div>
         <div class="input__field">
-          <label for="city">Количество цветов (M)</label>
+          <label for="color-count">Количество цветов (M)</label>
           <input
             class="input"
             type="number"
+            id="color-count"
             name="color-count"
             placeholder="Введите количество цветов"
           />
+        </div>
+        <div
+          class="input__field input__field--checkbox"
+          title="Если включено - поиск займёт меньше времени, но затратит больше ходов"
+        >
+          <input type="checkbox" id="fast-search" name="fast-search" />
+          <label for="fast-search">Быстрый поиск</label>
         </div>
         <button class="button" type="submit">Сгенерировать</button>
       </form>
@@ -59,8 +69,9 @@ function onSubmit() {
   tubesCount.value = Number(formData.get('tubes-count'))
   tubeVolume.value = Number(formData.get('tube-volume'))
   colorCount.value = Number(formData.get('color-count'))
+  const fastSearch = Boolean(formData.get('fast-search'))
 
-  nextTick(liquidSort.value?.generateRandomTubes)
+  nextTick(() => liquidSort.value?.generateRandomTubes(fastSearch))
 }
 </script>
 

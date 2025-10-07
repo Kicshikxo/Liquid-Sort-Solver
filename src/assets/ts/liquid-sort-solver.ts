@@ -114,7 +114,7 @@ export class LiquidSortSolver {
     return tubes.every(this.checkTubeSolved.bind(this))
   }
 
-  public generateSolvedMoves(maxDepth = 1000): Move[] | null {
+  public generateSolvedMoves(fastSearch = false, maxDepth = 1000): Move[] | null {
     const checkedStates = new Set<string>()
 
     const queue: { tubes: Tube[]; moves: Move[] }[] = [
@@ -122,7 +122,7 @@ export class LiquidSortSolver {
     ]
 
     while (queue.length > 0) {
-      const state = queue.shift()!
+      const state = fastSearch ? queue.pop()! : queue.shift()!
       const stateKey = JSON.stringify(state.tubes)
 
       if (checkedStates.has(stateKey)) continue

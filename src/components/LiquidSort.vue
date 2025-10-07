@@ -97,7 +97,7 @@ const colorMap: Record<string, string> = {
   24: 'var(--color-stone-400)',
 }
 
-function generateRandomTubes() {
+function generateRandomTubes(fastSearch = false) {
   currentHistoryIndex.value = 0
 
   liquidSortSolver.value = new LiquidSortSolver(
@@ -112,7 +112,7 @@ function generateRandomTubes() {
   console.log(liquidSortSolver.value.tubes)
 
   console.time('generateSolvedMoves')
-  liquidSortSolver.value.generateSolvedMoves()
+  liquidSortSolver.value.generateSolvedMoves(fastSearch)
   console.timeEnd('generateSolvedMoves')
   console.log(liquidSortSolver.value.moves)
 
