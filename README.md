@@ -46,7 +46,7 @@ npm install
 npm run dev
 ```
 
-### Сборка для продакшена
+### Сборка релизной версии
 
 ```bash
 npm run build
