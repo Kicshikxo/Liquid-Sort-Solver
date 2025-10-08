@@ -36,7 +36,7 @@
           class="input__field input__field--checkbox"
           title="Если включено - поиск займёт меньше времени, но решение потребует большего количества ходов. Рекомендуется для большого количества пробирок."
         >
-          <input type="checkbox" id="fast-search" name="fast-search" />
+          <input type="checkbox" id="fast-search" name="fast-search" checked />
           <label for="fast-search">Быстрый поиск</label>
         </div>
         <button class="button" type="submit">Сгенерировать</button>
