@@ -144,6 +144,11 @@ export class LiquidSortSolver {
           const targetTube = state.tubes[target]!
 
           if (targetTube[this.tubeVolume - 1] !== null) continue
+          if (sourceTube.every((color) => color === null)) continue
+
+          const targetTubeEmpty = targetTube.every((color) => color === null)
+          const colorsCount = new Set(sourceTube.filter((color) => color !== null)).size
+          if (targetTubeEmpty && colorsCount === 1) continue
 
           const lastMove = state.moves.at(-1)
           if (lastMove && lastMove[0] === target && lastMove[1] === source) continue
