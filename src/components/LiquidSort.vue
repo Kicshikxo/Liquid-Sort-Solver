@@ -143,7 +143,7 @@ function nextHistoryState() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding-top: 16px;
   gap: 16px;
 }
 

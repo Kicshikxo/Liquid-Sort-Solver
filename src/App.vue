@@ -91,11 +91,6 @@ function onSubmit() {
   width: 100%;
   min-height: 100%;
   position: absolute;
-  padding: 0;
-}
-@media (min-width: 768px) {
-  .page {
-    padding: 16px;
-  }
+  padding: 16px 0;
 }
 </style>
